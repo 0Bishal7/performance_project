@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Performance</title>
+    <!-- <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 0;
+            font-size: 1.5rem;
+        }
+
+        main {
+            margin: 20px auto;
+            max-width: 900px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        select, input[type="number"] {
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 8px 20px;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .content-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        h2 {
+            color: #4CAF50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            font-size: 1.5rem;
+            color: #ff5722;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            main {
+                width: 100%;
+                padding: 15px;
+            }
+
+            header {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            button {
+                width: 100%;
+                padding: 10px;
+            }
+
+            select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style> -->
+
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        /* Body and overall layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 0;
+            margin: 0;
+            line-height: 1.6;
+        }
+    
+        h1 {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 1.5rem 0;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+    
+        /* Main Content Area */
+        main {
+            margin: 0 auto;
+            max-width: 900px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+    
+        /* Header Styling */
+        header {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 1.5rem 0;
+            font-size: 2rem;
+            border-radius: 8px;
+        }
+    
+        /* Form Styling */
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+    
+        form label {
+            font-size: 1rem;
+            color: #333;
+        }
+    
+        select, input[type="number"], button {
+            padding: 8px 16px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+        }
+    
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 10px 20px;
+        }
+    
+        button:hover {
+            background-color: #45a049;
+        }
+    
+        select, input[type="number"] {
+            width: 250px;
+            min-width: 180px;
+        }
+    
+        /* Content Section */
+        .content-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+    
+        h2 {
+            color: #4CAF50;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+    
+        .highlight {
+            font-size: 1.5rem;
+            color: #ff5722;
+            font-weight: bold;
+        }
+    
+        /* Graphs */
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Metrics Styling */
+        h3 {
+            font-size: 1.6rem;
+            color: #333;
+            margin-top: 30px;
+        }
+    
+        p {
+            font-size: 1.2rem;
+            color: #555;
+            margin: 8px 0;
+        }
+    
+        p span {
+            font-weight: bold;
+        }
+    
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+    
+            main {
+                width: 100%;
+                padding: 20px;
+            }
+    
+            form {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+    
+            select, input[type="number"] {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+    
+            button {
+                width: 100%;
+                padding: 12px;
+            }
+    
+            h2 {
+                font-size: 1.6rem;
+            }
+    
+            .highlight {
+                font-size: 1.4rem;
+            }
+    
+            h3 {
+                font-size: 1.5rem;
+            }
+    
+            p {
+                font-size: 1.1rem;
+            }
+    
+            .content-section {
+                margin-top: 20px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Client Performance</h1>
+    <div class="content-section">
+        <h2>Maximum Drawdown: <span class="highlight">{{ max_drawdown_percentage }}%</span></h2>
+    </div>
+
+    <form method="GET" action="">
+        <label for="client">Select Client:</label>
+        <select name="client" id="client">
+            {% for client in clients %}
+                <option value="{{ client }}" {% if client == client_name %}selected{% endif %}>{{ client }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="starting_balance">Starting Balance:</label>
+        <input type="number" name="starting_balance" id="starting_balance" value="{{ starting_balance }}" step="any">
+
+        <button type="submit">Select</button>
+    </form>
+
+    <h2>Drawdown Graph</h2>
+    <img src="data:image/png;base64,{{ drawdown_img }}" alt="Drawdown Graph">
+
+    <h2>Equity Curve</h2>
+    <img src="data:image/png;base64,{{ equity_img }}" alt="Equity Curve">
+
+    <h3>Metrics for {{ client_name }}</h3>
+    <p>Win Rate: {{ win_rate }}</p>
+    <p>Loss Rate: {{ loss_rate }}</p>
+    <p>Expectancy: {{ expectancy }}</p>
+    <p>Maximum Drawdown: {{ max_drawdown }}</p>
+    <p>Maximum Drawdown Percentage: {{ max_drawdown_percentage }}%</p>
+    <p>Calmar Ratio: {{ calmar_ratio }}</p>
+    <p>Sharpe Ratio: {{ sharpe_ratio }}</p> 
+
+</body>
+</html>
