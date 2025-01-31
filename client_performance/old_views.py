@@ -7,15 +7,18 @@ import numpy as np
 from matplotlib.dates import DateFormatter, AutoDateLocator
 import pandas as pd
 
-# Function to calculate the metrics
-def calculate_metrics(df, client_name):
+
+def calculate_metrics(df, client_name, starting_balance):
     daily_profit_loss = df[['Date', client_name]].dropna()
-    
-    starting_balance = 1000000
+
     daily_profit_loss['CumulativeProfit'] = daily_profit_loss[client_name].cumsum()
     daily_profit_loss['Balance'] = starting_balance + daily_profit_loss['CumulativeProfit']
     daily_profit_loss['Drawdown'] = daily_profit_loss['Balance'] - daily_profit_loss['Balance'].cummax()
 
+
+    daily_profit_loss['DailyReturn'] = daily_profit_loss['Balance'].pct_change().fillna(0)
+
+ 
     win_trades = daily_profit_loss[daily_profit_loss[client_name] >= 0]
     loss_trades = daily_profit_loss[daily_profit_loss[client_name] < 0]
     win_rate = len(win_trades) / len(daily_profit_loss)
@@ -28,19 +31,27 @@ def calculate_metrics(df, client_name):
 
     max_drawdown = daily_profit_loss['Drawdown'].min()
 
-    win_rate = round(win_rate, 3)
-    loss_rate = round(loss_rate, 3)
-    expectancy = round(expectancy, 3)
-    max_drawdown = round(max_drawdown, 3)
-
-    # Calculate max drawdown percentage
+    
     max_drawdown_percentage = (max_drawdown / starting_balance) * 100
-    max_drawdown_percentage=round(max_drawdown_percentage,3)
+    max_drawdown_percentage = round(max_drawdown_percentage, 3)
 
-    return daily_profit_loss, win_rate, loss_rate, expectancy, max_drawdown, max_drawdown_percentage
+    
+    calmar_ratio = None
+    if max_drawdown != 0:
+        calmar_ratio = round(abs(expectancy) / abs(max_drawdown_percentage), 3)
+
+    
+    avg_daily_return = daily_profit_loss['DailyReturn'].mean()
+    std_daily_return = daily_profit_loss['DailyReturn'].std()
+
+    sharpe_ratio = (avg_daily_return * 252 - 0.08) / (std_daily_return * np.sqrt(252)) if std_daily_return != 0 else 0
+    sharpe_ratio = round(sharpe_ratio, 3)
+
+    
+    return daily_profit_loss, win_rate, loss_rate, expectancy, max_drawdown, max_drawdown_percentage, calmar_ratio, sharpe_ratio
 
 def plot_graph(data, graph_type):
-    data['Date'] = pd.to_datetime(data['Date'], format='%d.%m.%Y')
+    data['Date'] = pd.to_datetime(data['Date'], format='%d.%m.%Y') 
     data = data.sort_values(by='Date')
 
     plt.figure(figsize=(10, 6))
@@ -68,10 +79,12 @@ def plot_graph(data, graph_type):
 def performance_view(request):
     df = fetch_data_from_sheets()
 
-    clients = df.columns[1:].tolist()  
+    clients = df.columns[1:].tolist()
     client_name = request.GET.get('client', clients[0])  
 
-    daily_profit_loss, win_rate, loss_rate, expectancy, max_drawdown, max_drawdown_percentage = calculate_metrics(df, client_name)
+    starting_balance = float(request.GET.get('starting_balance', 1000000))
+    
+    daily_profit_loss, win_rate, loss_rate, expectancy, max_drawdown, max_drawdown_percentage, calmar_ratio, sharpe_ratio = calculate_metrics(df, client_name, starting_balance)
 
     drawdown_img = plot_graph(daily_profit_loss, 'drawdown')
     equity_img = plot_graph(daily_profit_loss, 'equity')
@@ -85,7 +98,10 @@ def performance_view(request):
         'loss_rate': loss_rate,
         'expectancy': expectancy,
         'max_drawdown': max_drawdown,
-        'max_drawdown_percentage': max_drawdown_percentage  
+        'max_drawdown_percentage': max_drawdown_percentage,
+        'calmar_ratio': calmar_ratio,
+        'sharpe_ratio': sharpe_ratio,
+        'starting_balance': starting_balance  
     }
 
     return render(request, 'client_performance/performance.html', context)

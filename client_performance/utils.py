@@ -7,6 +7,7 @@ def fetch_data_from_sheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     
     creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    # /home/sayan/Desktop/Work/Levitas/performance_project/credentials.json
     
     # Authorize the client to interact with the Sheets API
     client = gspread.authorize(creds)
