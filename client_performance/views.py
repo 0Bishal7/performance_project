@@ -61,7 +61,7 @@ def plot_graph(data, graph_type):
 
     plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
     plt.gca().xaxis.set_major_locator(AutoDateLocator())
-    plt.xticks(rotation=35)
+    plt.xticks(rotation=1)
     plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both'))
 
     buf = io.BytesIO()
